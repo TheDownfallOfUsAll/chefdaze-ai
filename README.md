@@ -1,9 +1,4 @@
-diff --git a/c:\Users\Hp\chefdaze-ai\README.md b/c:\Users\Hp\chefdaze-ai\README.md
-new file mode 100644
---- /dev/null
-+++ b/c:\Users\Hp\chefdaze-ai\README.md
-@@ -0,0 +1,153 @@
-+# 🍳 Cook de Staku – AI-Powered Smart Recipe Assistant
+# 🍳 Cook de Staku – AI-Powered Smart Recipe Assistant
 +
 +**Cook de Staku** is a modern, interactive cooking assistant built with **Streamlit**. It empowers home cooks of all skill levels to generate recipes, plan meals, substitute ingredients, and get smart culinary guidance.
 +
@@ -156,3 +151,4 @@ new file mode 100644
 +* Integration with grocery delivery services
 +
 +---
+
