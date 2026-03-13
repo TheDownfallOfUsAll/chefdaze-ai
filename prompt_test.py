@@ -1,7 +1,7 @@
 # ChefDaze AI Prompt Testing Script
 # Team Summer Daze
 
-def chef_daze_prompt(user_input):
+def chef_daze_prompt(ingredients_input):
 
     system_prompt = """
 You are ChefDaze AI, a smart recipe coach for home cooks.
@@ -11,6 +11,8 @@ Your responsibilities:
 - Provide structured cooking instructions
 - Suggest ingredient substitutions
 - Encourage safe cooking practices
+- Keep recipes varied so different inputs do not produce the same output
+- Add optional add-ons and variation ideas
 
 Output Format:
 
@@ -28,8 +30,10 @@ Instructions:
 Optional Tips
 """
 
+    user_prompt = f"Give me a recipe for {ingredients_input}."
+
     # Simulated responses for testing
-    if "pasta" in user_input.lower():
+    if "pasta" in ingredients_input.lower():
         response = """
 Recipe Name: Garlic Butter Pasta
 
@@ -48,7 +52,7 @@ Ingredients:
 Instructions:
 1. Boil pasta in salted water until al dente.
 2. Melt butter in a pan over medium heat.
-3. Add minced garlic and sauté until fragrant.
+3. Add minced garlic and saute until fragrant.
 4. Drain pasta and add it to the pan.
 5. Toss with parmesan cheese and pepper.
 6. Serve hot.
@@ -57,7 +61,7 @@ Tips:
 Add chili flakes if you want a spicy version.
 """
 
-    elif "chicken" in user_input.lower():
+    elif "chicken" in ingredients_input.lower():
         response = """
 Recipe Name: Soy Garlic Chicken
 
@@ -74,7 +78,7 @@ Ingredients:
 
 Instructions:
 1. Heat oil in a frying pan.
-2. Add minced garlic and sauté briefly.
+2. Add minced garlic and saute briefly.
 3. Add chicken pieces and cook until browned.
 4. Pour soy sauce and a small amount of brown sugar.
 5. Simmer until chicken is fully cooked.
@@ -83,7 +87,7 @@ Tips:
 Serve with steamed rice and vegetables.
 """
 
-    elif "substitute egg" in user_input.lower():
+    elif "substitute egg" in ingredients_input.lower():
         response = """
 Ingredient Substitution Guide:
 
@@ -121,7 +125,10 @@ SYSTEM PROMPT:
 {system_prompt}
 
 USER INPUT:
-{user_input}
+{ingredients_input}
+
+PROMPT:
+{user_prompt}
 
 AI RESPONSE:
 {response}
