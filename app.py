@@ -1,7 +1,7 @@
 ﻿import streamlit as st
 import random
 import re
-import hashlib
+
 
 # -------------------------
 # PAGE CONFIG
@@ -18,28 +18,36 @@ st.set_page_config(
 st.markdown("""
 <style>
 :root{
---bg-1:#ff6a00;
---bg-2:#ff8c00;
---bg-3:#ffb300;
---bg-4:#ffd54f;
---ink:#1a1a1a;
---accent:#3a0ca3;
---card:#ffffff;
+--bg-1:#fff7ed;
+--bg-2:#ffedd5;
+--bg-3:#fde68a;
+--bg-4:#fecaca;
+--ink:#1f1b16;
+--muted:#5c4a3a;
+--accent:#b45309;
+--accent-2:#0f766e;
+--card:rgba(255,255,255,0.9);
+--card-strong:#ffffff;
 --butter:#fff3cd;
---chat-user:#ffd1a1;
---chat-bot:#ffe39a;
---chat-border:rgba(0,0,0,0.12);
---input-bg:#ffe0b2;
---input-bg-strong:#ffd79a;
+--chat-user:#ffe6c7;
+--chat-bot:#fff2d6;
+--chat-border:rgba(31,27,22,0.12);
+--input-bg:#fff7d6;
+--input-bg-strong:#ffe4a3;
+--focus:#f59e0b;
+--shadow-sm:0 4px 12px rgba(31,27,22,0.12);
+--shadow-md:0 12px 28px rgba(31,27,22,0.18);
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800;900&family=Source+Sans+3:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Manrope:wght@400;600;700&display=swap');
 
 /* MAIN BACKGROUND */
 [data-testid="stAppViewContainer"]{
-background: linear-gradient(135deg,var(--bg-1),var(--bg-2),var(--bg-3),var(--bg-4));
+background:
+radial-gradient(circle at 8% 8%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 25%, transparent 45%),
+linear-gradient(135deg,var(--bg-1),var(--bg-2),var(--bg-3),var(--bg-4));
 background-attachment: fixed;
-font-family: 'Source Sans 3', sans-serif;
+font-family: 'Manrope', sans-serif;
 color:var(--ink);
 }
 
@@ -48,69 +56,85 @@ color:var(--ink);
 content:"";
 position:fixed;
 inset:0;
-background-image: radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px);
-background-size: 18px 18px;
-opacity:0.18;
+background-image:
+linear-gradient(120deg, rgba(255,255,255,0.28) 0, rgba(255,255,255,0.28) 1px, transparent 1px, transparent 16px),
+radial-gradient(rgba(31,27,22,0.08) 1px, transparent 1px);
+background-size: 24px 24px, 18px 18px;
+opacity:0.35;
 pointer-events:none;
 }
 
 /* SIDEBAR */
 [data-testid="stSidebar"]{
-background: linear-gradient(180deg,var(--bg-2),var(--bg-3));
-color:white;
-font-weight:bold;
+background: linear-gradient(180deg,#fde68a,#f7b267);
+color:var(--ink);
+font-weight:700;
+}
+
+[data-testid="stSidebar"] *{
+color:var(--ink);
 }
 
 /* TITLES */
 h1{
 color:var(--accent);
 font-weight:900;
-font-size:3.2rem;
-font-family:'Playfair Display', serif;
-letter-spacing:0.5px;
-text-shadow: 1px 1px 2px #ffb300;
+font-size:3.1rem;
+font-family:'Fraunces', serif;
+letter-spacing:0.4px;
+text-shadow: 0 2px 10px rgba(180,83,9,0.2);
 }
 
 h2,h3{
-color:var(--accent);
+color:var(--accent-2);
 font-weight:800;
-text-shadow: 1px 1px 1px #ffa500;
-font-family:'Playfair Display', serif;
+text-shadow: 0 1px 6px rgba(15,118,110,0.15);
+font-family:'Fraunces', serif;
 }
 
 /* BUTTON STYLE */
 .stButton>button{
-background: linear-gradient(90deg,#f77f00,#ffb300);
-color:white;
-border-radius:15px;
-border:none;
-height:3.2em;
-font-weight:bold;
-font-size:1.1rem;
-transition:0.3s;
-box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+background: linear-gradient(90deg,#fde68a,#f59e0b);
+color:var(--ink);
+border-radius:14px;
+border:1px solid rgba(31,27,22,0.15);
+height:3em;
+font-weight:700;
+font-size:1rem;
+transition:0.25s ease;
+box-shadow: var(--shadow-sm);
 }
 
 .stButton>button:hover{
-background: linear-gradient(90deg,#ff6a00,#ffb300);
-transform:scale(1.05);
+background: linear-gradient(90deg,#ffe39a,#f59e0b);
+transform:translateY(-2px);
+box-shadow: var(--shadow-md);
 }
 
 /* INPUT BOX */
-.stTextInput>div>div>input{
+.stTextInput>div>div>input,
+.stTextArea>div>div>textarea,
+.stNumberInput input,
+div[data-baseweb="select"] input{
 border-radius:12px;
-border:2px solid #ff8c00;
-padding:8px;
+border:2px solid var(--input-bg-strong);
+padding:10px;
 font-size:1rem;
 background:var(--input-bg);
+color:var(--ink);
+}
+
+.stTextInput>div>div>input::placeholder,
+.stTextArea>div>div>textarea::placeholder{
+color:rgba(31,27,22,0.55);
 }
 
 /* CHAT INPUT */
 div[data-testid="stChatInput"]{
-background:#000000;
+background:var(--input-bg);
 border-radius:16px;
 padding:6px;
-border:1px solid #000000;
+border:1px solid var(--input-bg-strong);
 }
 
 div[data-testid="stChatInput"]>div{
@@ -119,27 +143,31 @@ background:transparent;
 
 div[data-testid="stChatInput"] textarea{
 border-radius:14px;
-border:2px solid #000000;
+border:2px solid var(--input-bg-strong);
 padding:10px;
 font-size:1rem;
-background:#000000;
-color:#ffffff;
+background:var(--input-bg);
+color:var(--ink);
+}
+
+div[data-testid="stChatInput"] textarea::placeholder{
+color:rgba(31,27,22,0.55);
 }
 
 /* RECIPE CARD */
 .recipe-card{
-background: rgba(255,255,255,0.96);
-padding:25px;
+background: var(--card);
+padding:24px;
 border-radius:20px;
-box-shadow: 0px 10px 25px rgba(0,0,0,0.25);
+box-shadow: var(--shadow-md);
 margin-top:20px;
-transition: 0.3s;
-border:1px solid rgba(255,255,255,0.5);
-backdrop-filter: blur(2px);
+transition: 0.25s ease;
+border:1px solid rgba(255,255,255,0.7);
+backdrop-filter: blur(6px);
 }
 
 .recipe-card:hover{
-transform: scale(1.02);
+transform: translateY(-2px);
 }
 
 /* USER CHAT BOX */
@@ -148,7 +176,7 @@ background:var(--chat-user);
 padding:18px;
 border-radius:15px;
 margin-top:10px;
-box-shadow:0px 4px 12px rgba(0,0,0,0.15);
+box-shadow:var(--shadow-sm);
 font-size:1rem;
 border:1px solid var(--chat-border);
 }
@@ -159,7 +187,7 @@ background:var(--chat-bot);
 padding:18px;
 border-radius:15px;
 margin-top:10px;
-box-shadow:0px 4px 12px rgba(0,0,0,0.15);
+box-shadow:var(--shadow-sm);
 font-size:1rem;
 border:1px solid var(--chat-border);
 }
@@ -173,7 +201,7 @@ div[data-testid="stChatMessage"]>div{
 background:var(--chat-bot);
 color:var(--ink);
 border:1px solid var(--chat-border);
-box-shadow: 0px 6px 14px rgba(0,0,0,0.12);
+box-shadow: var(--shadow-sm);
 }
 
 .stChatMessage.stChatMessageUser>div{
@@ -185,19 +213,17 @@ background:var(--chat-bot);
 }
 
 /* INPUT BOX HIGHLIGHT */
-.stTextInput>div>div>input:focus{
-border:2px solid #ff6a00;
-box-shadow:0 0 8px #ffa500;
-}
-
+.stTextInput>div>div>input:focus,
+.stTextArea>div>div>textarea:focus,
+.stNumberInput input:focus,
 div[data-testid="stChatInput"] textarea:focus{
-border:2px solid #ff6a00;
-box-shadow:0 0 8px #ffa500;
+border:2px solid var(--focus);
+box-shadow:0 0 8px rgba(245,158,11,0.4);
 }
 
 /* HORIZONTAL RULE */
 hr{
-border-top: 2px solid #ff8c00;
+border-top: 2px solid rgba(245,158,11,0.6);
 }
 
 /* SECTION BADGE */
@@ -345,30 +371,27 @@ def suggest_add_ons(ingredients_lower, existing_items):
     return picks[:6]
 
 
-def stable_seed(text):
-    digest = hashlib.md5(text.encode("utf-8")).hexdigest()
-    return int(digest[:8], 16)
+def build_rng(seed_value=None):
+    if seed_value is None:
+        return random.SystemRandom()
+    return random.Random(seed_value)
 
 
-def seeded_choice(options, seed_value):
-    if not options:
-        return None
-    rng = random.Random(seed_value)
-    return rng.choice(options)
-
-
-def generate_recipe(ingredients):
+def generate_recipe(ingredients, seed_value=None):
     ingredients_input = ingredients.strip()
     if not ingredients_input:
-        return "Please enter a few ingredients so I can build a recipe."
+        return "Please enter a few ingredients so I can build a recipe.", None, None
+
+    rng = build_rng(seed_value)
 
     ingredients_lower = ingredients_input.lower()
     parsed_items = parse_ingredients(ingredients_input)
     display_items = [item.title() for item in parsed_items]
-    display_name = ", ".join(display_items) if display_items else ingredients_input
-    seed = stable_seed(ingredients_lower)
+    display_name = ", ".join(display_items) if display_items else ingredients_input.strip()
 
-    base = f"### 🥗 Smart Recipe for: {display_name}\n\nServing Size: {servings}\n"
+    base = f"### 🥗 Smart Recipe for: {display_name}\n\nServing Size: {servings}\nSkill Level: {skill_level}\n"
+    if diet:
+        base += f"Diet Preferences: {', '.join(diet)}\n"
 
     # Default Prep & Cook Time
     prep = "Prep Time: 10 mins"
@@ -390,7 +413,14 @@ def generate_recipe(ingredients):
     if "chicken" in ingredients_lower:
         add_profile(
             "chicken",
-            ["Soy Garlic Chicken", "Lemon Pepper Chicken", "Honey Chili Chicken"],
+            [
+                "Soy Garlic Chicken",
+                "Lemon Pepper Chicken",
+                "Honey Chili Chicken",
+                "Ginger Lime Chicken",
+                "Smoky Paprika Chicken",
+                "Herb Butter Chicken"
+            ],
             ["Chicken", "Garlic", "Soy Sauce", "Cooking Oil", "Black Pepper"],
             [
                 "Pat chicken dry and season with salt and pepper.",
@@ -400,13 +430,20 @@ def generate_recipe(ingredients):
                 "Simmer briefly and serve with a carb or vegetables."
             ],
             "Skillet",
-            ["Skillet", "Sheet-Pan Roast", "Stir-Fry Bowl"]
+            ["Skillet", "Sheet-Pan Roast", "Stir-Fry Bowl", "Grain Bowl"]
         )
     # Pasta-based
     if "pasta" in ingredients_lower or "spaghetti" in ingredients_lower or "noodle" in ingredients_lower:
         add_profile(
             "pasta",
-            ["Garlic Butter Pasta", "Tomato Basil Pasta", "Creamy Pepper Pasta"],
+            [
+                "Garlic Butter Pasta",
+                "Tomato Basil Pasta",
+                "Creamy Pepper Pasta",
+                "Lemon Herb Pasta",
+                "Chili Olive Oil Pasta",
+                "Roasted Veg Pasta"
+            ],
             ["Pasta", "Garlic", "Olive Oil", "Butter", "Parmesan Cheese"],
             [
                 "Boil pasta until al dente and reserve a splash of water.",
@@ -422,7 +459,14 @@ def generate_recipe(ingredients):
     if any(x in ingredients_lower for x in ["vegetable", "broccoli", "carrot", "spinach", "zucchini", "mushroom"]):
         add_profile(
             "vegetable",
-            ["Quick Veggie Stir-Fry", "Garlic Veggie Skillet", "Bright Lemon Veg Medley"],
+            [
+                "Quick Veggie Stir-Fry",
+                "Garlic Veggie Skillet",
+                "Bright Lemon Veg Medley",
+                "Sesame Veggie Bowl",
+                "Roasted Market Veg",
+                "Spicy Veggie Saute"
+            ],
             ["Mixed Vegetables", "Garlic", "Soy Sauce", "Olive Oil"],
             [
                 "Heat oil in a pan over medium-high heat.",
@@ -438,7 +482,13 @@ def generate_recipe(ingredients):
     if "beef" in ingredients_lower or "steak" in ingredients_lower:
         add_profile(
             "beef",
-            ["Pepper Garlic Beef", "Soy Glaze Beef", "Chili Beef Skillet"],
+            [
+                "Pepper Garlic Beef",
+                "Soy Glaze Beef",
+                "Chili Beef Skillet",
+                "Ginger Beef Stir-Fry",
+                "Smoky Beef Skillet"
+            ],
             ["Beef", "Garlic", "Black Pepper", "Soy Sauce", "Cooking Oil"],
             [
                 "Pat beef dry and season with salt and pepper.",
@@ -454,7 +504,13 @@ def generate_recipe(ingredients):
     if "pork" in ingredients_lower or "bacon" in ingredients_lower:
         add_profile(
             "pork",
-            ["Garlic Pepper Pork", "Sweet Soy Pork", "Smoky Paprika Pork"],
+            [
+                "Garlic Pepper Pork",
+                "Sweet Soy Pork",
+                "Smoky Paprika Pork",
+                "Honey Garlic Pork",
+                "Citrus Herb Pork"
+            ],
             ["Pork", "Garlic", "Black Pepper", "Cooking Oil", "Salt"],
             [
                 "Season pork with salt and pepper.",
@@ -470,7 +526,13 @@ def generate_recipe(ingredients):
     if "tofu" in ingredients_lower:
         add_profile(
             "tofu",
-            ["Crispy Garlic Tofu", "Ginger Soy Tofu", "Chili Lime Tofu"],
+            [
+                "Crispy Garlic Tofu",
+                "Ginger Soy Tofu",
+                "Chili Lime Tofu",
+                "Sesame Tofu Bowl",
+                "Maple Pepper Tofu"
+            ],
             ["Tofu", "Soy Sauce", "Garlic", "Cornstarch", "Cooking Oil"],
             [
                 "Pat tofu dry and cut into cubes.",
@@ -486,7 +548,13 @@ def generate_recipe(ingredients):
     if "shrimp" in ingredients_lower:
         add_profile(
             "shrimp",
-            ["Lemon Butter Shrimp", "Garlic Chili Shrimp", "Herb Shrimp Skillet"],
+            [
+                "Lemon Butter Shrimp",
+                "Garlic Chili Shrimp",
+                "Herb Shrimp Skillet",
+                "Paprika Lime Shrimp",
+                "Ginger Shrimp Bowl"
+            ],
             ["Shrimp", "Garlic", "Lemon", "Butter", "Olive Oil"],
             [
                 "Pat shrimp dry and season with salt and pepper.",
@@ -502,7 +570,13 @@ def generate_recipe(ingredients):
     if any(x in ingredients_lower for x in ["fish", "salmon", "tuna"]):
         add_profile(
             "fish",
-            ["Pan-Seared Lemon Fish", "Garlic Herb Fish", "Spiced Fish Skillet"],
+            [
+                "Pan-Seared Lemon Fish",
+                "Garlic Herb Fish",
+                "Spiced Fish Skillet",
+                "Citrus Pepper Fish",
+                "Miso Glaze Fish"
+            ],
             ["Fish", "Lemon", "Olive Oil", "Garlic", "Salt"],
             [
                 "Season fish with salt and pepper.",
@@ -516,7 +590,7 @@ def generate_recipe(ingredients):
         )
     # Egg-based
     if "egg" in ingredients_lower:
-        egg_names = ["Veggie Egg Skillet", "Cheesy Egg Scramble"]
+        egg_names = ["Veggie Egg Skillet", "Cheesy Egg Scramble", "Herb Egg Hash"]
         if "rice" in ingredients_lower:
             egg_names.append("Quick Egg Fried Rice")
         add_profile(
@@ -625,11 +699,14 @@ def generate_recipe(ingredients):
             "Season to taste and serve."
         ]
 
-    selected = seeded_choice(profiles, seed)
+    def pick(options):
+        return rng.choice(options) if options else None
+
+    selected = pick(profiles)
     if selected:
         method_pool = selected.get("method_pool") or [selected["method"]]
-        method_label = seeded_choice(method_pool, seed + 9) or selected["method"]
-        recipe_name = seeded_choice(selected["name_options"], seed + 11)
+        method_label = pick(method_pool) or selected["method"]
+        recipe_name = pick(selected["name_options"])
         ingredient_list = list(selected["ingredients"])
         protein_hint = None
         veg_hint = None
@@ -687,9 +764,9 @@ def generate_recipe(ingredients):
         carbs = gather(carb_map)
         veggies = gather(veg_map)
 
-        protein_pick = seeded_choice(proteins, seed + 1)
-        carb_pick = seeded_choice(carbs, seed + 2)
-        veg_pick = seeded_choice(veggies, seed + 3)
+        protein_pick = pick(proteins)
+        carb_pick = pick(carbs)
+        veg_pick = pick(veggies)
 
         method_pool = []
         if any(x in ingredients_lower for x in ["pasta", "spaghetti", "noodle"]):
@@ -705,13 +782,17 @@ def generate_recipe(ingredients):
         else:
             method_pool += ["Skillet", "Soup"]
 
-        method_label = seeded_choice(method_pool, seed + 4) or "Skillet"
+        method_label = pick(method_pool) or "Skillet"
 
         main_name = protein_pick or veg_pick or "Pantry"
         if method_label in ["Wrap", "Sandwich"]:
             recipe_name = f"{main_name} {method_label}"
         else:
             recipe_name = f"{method_label} {main_name}"
+
+        adjectives = ["Quick", "Cozy", "Bright", "Smoky", "Herb", "Zesty", "Savory"]
+        if rng.random() < 0.7:
+            recipe_name = f"{rng.choice(adjectives)} {recipe_name}"
 
         ingredient_list = [item for item in [
             protein_pick, veg_pick, carb_pick, "Garlic", "Olive Oil", "Salt", "Black Pepper"
@@ -767,8 +848,6 @@ def generate_recipe(ingredients):
             "Oil or butter"
         ]
 
-    sys_rng = random.SystemRandom()
-
     signature_options = [
         "Finish with a squeeze of lemon and a drizzle of olive oil.",
         "Top with chopped herbs and a sprinkle of cheese.",
@@ -776,7 +855,7 @@ def generate_recipe(ingredients):
         "Sprinkle chili flakes for heat and color.",
         "Add toasted nuts or seeds for crunch."
     ]
-    signature_finish = sys_rng.choice(signature_options)
+    signature_finish = rng.choice(signature_options)
 
     variation_options = [
         "Swap the protein for tofu and add sesame oil.",
@@ -785,8 +864,8 @@ def generate_recipe(ingredients):
         "Add a crunchy topping like breadcrumbs or nuts.",
         "Brighten it with lemon or lime zest."
     ]
-    variation_count = 2 if len(variation_options) < 3 else sys_rng.randint(2, 3)
-    variation_picks = sys_rng.sample(variation_options, min(variation_count, len(variation_options)))
+    variation_count = 2 if len(variation_options) < 3 else rng.randint(2, 3)
+    variation_picks = rng.sample(variation_options, min(variation_count, len(variation_options)))
     variations_text = "\n".join(f"- {v}" for v in variation_picks)
 
     # Format output
@@ -794,8 +873,8 @@ def generate_recipe(ingredients):
     instructions_text = "\n".join(f"{idx+1}. {step}" for idx, step in enumerate(instructions))
     add_ons = suggest_add_ons(ingredients_lower, ingredient_list)
     if len(add_ons) > 2:
-        pick_count = sys_rng.randint(2, min(6, len(add_ons)))
-        add_ons = sys_rng.sample(add_ons, pick_count)
+        pick_count = rng.randint(2, min(6, len(add_ons)))
+        add_ons = rng.sample(add_ons, pick_count)
     add_ons_text = "\n".join(f"- {i}" for i in add_ons)
     flavor_options = [
         "Savory: soy sauce + garlic + black pepper",
@@ -807,7 +886,7 @@ def generate_recipe(ingredients):
         "Herby: basil + parsley + olive oil"
     ]
     flavor_pick_count = 3 if len(flavor_options) >= 3 else len(flavor_options)
-    flavor_picks = sys_rng.sample(flavor_options, flavor_pick_count)
+    flavor_picks = rng.sample(flavor_options, flavor_pick_count)
     flavor_text = "\n".join(f"- {f}" for f in flavor_picks)
 
     recipe_text = f"""
@@ -847,53 +926,395 @@ def generate_recipe(ingredients):
 **Chef Tip**  
 Taste at the end and adjust salt, acid, or heat to match your preference.
 """
-    return recipe_text
+    signature = f"{recipe_name}|{method_label}|{display_name}"
+    return recipe_text, signature, recipe_name
 
 # -------------------------
 # Ingredient Substitute
 # -------------------------
-def substitute_ingredient(question):
-    question = question.lower()
-    subs = {
-        "egg": ["1/4 cup applesauce", "1 mashed banana", "1 tbsp flaxseed + 3 tbsp water", "Yogurt"],
-        "milk": ["Almond milk", "Soy milk", "Oat milk", "Coconut milk"],
-        "butter": ["Margarine", "Olive oil", "Coconut oil", "Avocado"],
-        "sugar": ["Honey", "Maple syrup", "Agave nectar"],
-        "flour": ["Oat flour", "Almond flour", "Coconut flour"]
+def clean_ingredient_name(text):
+    if not text:
+        return ""
+    text = re.sub(r"[^a-zA-Z\s]", " ", text.lower())
+    text = re.sub(r"\s+", " ", text).strip()
+    if not text:
+        return ""
+    stop_words = {
+        "a", "an", "the", "and", "or", "with", "for", "to", "instead", "of",
+        "use", "using", "substitute", "replace", "swap", "can", "i", "you",
+        "your", "my", "please", "what", "which", "is", "are", "in", "on"
     }
-    for key, value in subs.items():
-        if key in question:
-            return f"🥚 {key.title()} Substitutes\n\n- " + "\n- ".join(value)
-    return "Try specifying which ingredient you want to substitute."
+    words = [w for w in text.split() if w not in stop_words]
+    if not words:
+        return ""
+    if len(words) >= 2:
+        candidate = " ".join(words[-2:])
+    else:
+        candidate = words[0]
+    if candidate.endswith("ies"):
+        candidate = candidate[:-3] + "y"
+    elif candidate.endswith("s") and not candidate.endswith("ss"):
+        candidate = candidate[:-1]
+    return candidate.strip()
+
+
+def extract_ingredient_name(question):
+    if not question:
+        return ""
+    text = question.lower()
+    if "," in text:
+        text = text.split(",")[0]
+    patterns = [
+        r"instead of ([a-zA-Z\s]+)",
+        r"substitute for ([a-zA-Z\s]+)",
+        r"replace ([a-zA-Z\s]+)",
+        r"swap ([a-zA-Z\s]+)"
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if match:
+            return clean_ingredient_name(match.group(1))
+    return clean_ingredient_name(text)
+
+
+def detect_category(ingredient):
+    ingredient_lower = ingredient.lower()
+    protein_keys = {
+        "chicken", "beef", "pork", "fish", "salmon", "tuna", "shrimp",
+        "tofu", "tempeh", "egg", "bean", "lentil", "chickpea", "turkey"
+    }
+    dairy_keys = {"milk", "cream", "butter", "cheese", "yogurt"}
+    grain_keys = {"rice", "pasta", "noodle", "bread", "flour", "oat", "quinoa", "tortilla"}
+    veg_keys = {
+        "spinach", "broccoli", "carrot", "zucchini", "mushroom", "pepper",
+        "onion", "tomato", "cabbage", "cauliflower", "potato", "eggplant"
+    }
+    sweetener_keys = {"sugar", "honey", "maple", "agave", "syrup"}
+    fat_keys = {"oil", "butter", "ghee", "lard"}
+    acid_keys = {"vinegar", "lemon", "lime"}
+    herb_keys = {"basil", "parsley", "cilantro", "mint", "rosemary", "thyme", "dill"}
+    spice_keys = {"cumin", "paprika", "chili", "pepper", "curry", "turmeric", "cinnamon", "ginger"}
+    thickener_keys = {"cornstarch", "arrowroot", "starch"}
+
+    if any(k in ingredient_lower for k in protein_keys):
+        return "protein"
+    if any(k in ingredient_lower for k in dairy_keys):
+        return "dairy"
+    if any(k in ingredient_lower for k in grain_keys):
+        return "grain"
+    if any(k in ingredient_lower for k in veg_keys):
+        return "vegetable"
+    if any(k in ingredient_lower for k in sweetener_keys):
+        return "sweetener"
+    if any(k in ingredient_lower for k in fat_keys):
+        return "fat"
+    if any(k in ingredient_lower for k in acid_keys):
+        return "acid"
+    if any(k in ingredient_lower for k in herb_keys):
+        return "herb"
+    if any(k in ingredient_lower for k in spice_keys):
+        return "spice"
+    if any(k in ingredient_lower for k in thickener_keys):
+        return "thickener"
+    return "general"
+
+
+def substitute_ingredient(question):
+    ingredient = extract_ingredient_name(question)
+    if not ingredient:
+        return "Please enter an ingredient you want to substitute."
+
+    rng = random.SystemRandom()
+
+    alias_map = {
+        "bell pepper": "pepper",
+        "capsicum": "pepper",
+        "scallion": "green onion",
+        "green onion": "onion",
+        "spring onion": "onion",
+        "chicken breast": "chicken",
+        "chicken thigh": "chicken",
+        "ground beef": "beef",
+        "minced beef": "beef",
+        "ground pork": "pork"
+    }
+    key = alias_map.get(ingredient, ingredient)
+
+    subs_catalog = {
+        "egg": ["1/4 cup applesauce", "1 mashed banana", "1 tbsp flaxseed + 3 tbsp water", "Aquafaba (3 tbsp)", "Silken tofu"],
+        "milk": ["Almond milk", "Soy milk", "Oat milk", "Coconut milk", "Half-and-half + water"],
+        "butter": ["Olive oil", "Coconut oil", "Ghee", "Avocado oil", "Plant-based butter"],
+        "sugar": ["Honey", "Maple syrup", "Agave nectar", "Brown sugar", "Coconut sugar"],
+        "flour": ["Oat flour", "Almond flour", "Rice flour", "Coconut flour", "All-purpose flour"],
+        "cream": ["Coconut cream", "Greek yogurt", "Half-and-half", "Cashew cream"],
+        "yogurt": ["Sour cream", "Greek yogurt", "Coconut yogurt", "Buttermilk"],
+        "cheese": ["Nutritional yeast", "Vegan cheese", "Feta", "Parmesan"],
+        "soy sauce": ["Tamari", "Coconut aminos", "Worcestershire", "Fish sauce (use less)"],
+        "garlic": ["Garlic powder", "Shallot", "Onion", "Chive"],
+        "onion": ["Shallot", "Leek", "Scallion", "Onion powder"],
+        "tomato": ["Crushed tomatoes", "Tomato paste + water", "Roasted red pepper", "Salsa"],
+        "lemon": ["Lime", "Vinegar", "White wine", "Yuzu"],
+        "lime": ["Lemon", "Vinegar", "Rice vinegar", "Yuzu"],
+        "vinegar": ["Lemon juice", "Lime juice", "Apple cider vinegar", "White wine vinegar"],
+        "rice": ["Quinoa", "Cauliflower rice", "Couscous", "Barley"],
+        "pasta": ["Zoodles", "Rice noodles", "Spaghetti squash", "Gnocchi"],
+        "bread": ["Tortilla", "Pita", "Lettuce wrap", "Rice cakes"],
+        "chicken": ["Turkey", "Tofu", "Mushrooms", "Chickpeas"],
+        "beef": ["Pork", "Turkey", "Mushrooms", "Lentils"],
+        "pork": ["Chicken", "Turkey", "Tofu", "Mushrooms"],
+        "fish": ["Shrimp", "Chicken", "Tofu", "Mushrooms"],
+        "shrimp": ["Chicken", "Tofu", "Scallops", "Mushrooms"],
+        "tofu": ["Tempeh", "Chickpeas", "Mushrooms", "Eggs"],
+        "mushroom": ["Eggplant", "Zucchini", "Bell pepper", "Tofu"],
+        "spinach": ["Kale", "Chard", "Arugula", "Bok choy"],
+        "broccoli": ["Cauliflower", "Green beans", "Asparagus", "Brussels sprouts"],
+        "carrot": ["Parsnip", "Sweet potato", "Pumpkin", "Zucchini"],
+        "potato": ["Sweet potato", "Cauliflower", "Parsnip", "Turnip"],
+        "oil": ["Olive oil", "Avocado oil", "Canola oil", "Ghee"],
+        "olive oil": ["Avocado oil", "Canola oil", "Ghee", "Butter"]
+    }
+
+    category_subs = {
+        "protein": ["Tofu", "Tempeh", "Chickpeas", "Lentils", "Mushrooms"],
+        "dairy": ["Coconut milk", "Cashew cream", "Plant-based yogurt", "Evaporated milk"],
+        "grain": ["Rice", "Quinoa", "Potatoes", "Cauliflower rice"],
+        "vegetable": ["Zucchini", "Eggplant", "Bell pepper", "Cauliflower"],
+        "sweetener": ["Honey", "Maple syrup", "Agave", "Brown sugar"],
+        "fat": ["Olive oil", "Avocado oil", "Butter", "Ghee"],
+        "acid": ["Lemon juice", "Lime juice", "Apple cider vinegar", "White wine vinegar"],
+        "herb": ["Parsley", "Cilantro", "Basil", "Dill"],
+        "spice": ["Cumin", "Paprika", "Chili flakes", "Coriander"],
+        "thickener": ["Cornstarch", "Arrowroot", "Flour", "Potato starch"],
+        "general": ["Shallot", "Garlic", "Leek", "Bell pepper"]
+    }
+
+    options = subs_catalog.get(key)
+    category = detect_category(key)
+    if not options:
+        options = category_subs.get(category, category_subs["general"])
+
+    options = [item for item in options if item.lower() != key.lower()]
+    options = list(dict.fromkeys(options))
+    pick_count = min(4, len(options)) if options else 0
+    if pick_count == 0:
+        options = category_subs["general"]
+        pick_count = min(4, len(options))
+
+    picks = rng.sample(options, pick_count)
+    substitutes_text = "\n".join(f"- {item}" for item in picks)
+
+    idea_templates = {
+        "protein": [
+            "Skillet {ingredient} with garlic and herbs",
+            "{ingredient} stir-fry with vegetables",
+            "{ingredient} grain bowl with a quick sauce",
+            "Roasted {ingredient} with lemon and olive oil"
+        ],
+        "vegetable": [
+            "Roasted {ingredient} with olive oil and herbs",
+            "{ingredient} stir-fry with garlic and soy sauce",
+            "Sheet-pan {ingredient} with potatoes",
+            "{ingredient} soup with onions and broth"
+        ],
+        "grain": [
+            "{ingredient} bowl with vegetables and sauce",
+            "{ingredient} fried rice with eggs or tofu",
+            "Warm {ingredient} salad with herbs",
+            "One-pan {ingredient} and veggies"
+        ],
+        "dairy": [
+            "Creamy pasta using {ingredient}",
+            "Baked casserole with {ingredient}",
+            "Smoothie with {ingredient} and fruit",
+            "Dip or sauce using {ingredient}"
+        ],
+        "sweetener": [
+            "Stir {ingredient} into oatmeal or yogurt",
+            "Bake {ingredient} into muffins or cookies",
+            "Use {ingredient} in a simple vinaigrette",
+            "Sweeten a fruit compote with {ingredient}"
+        ],
+        "spice": [
+            "Season roasted vegetables with {ingredient}",
+            "Mix {ingredient} into a quick marinade",
+            "Stir {ingredient} into soup or stew",
+            "Sprinkle {ingredient} over eggs or tofu"
+        ],
+        "herb": [
+            "Finish a salad with {ingredient}",
+            "Blend {ingredient} into a simple sauce",
+            "Add {ingredient} to pasta or grain bowls",
+            "Top roasted vegetables with {ingredient}"
+        ],
+        "fat": [
+            "Saute aromatics in {ingredient}",
+            "Use {ingredient} for a quick dressing",
+            "Roast vegetables with {ingredient}",
+            "Finish a soup with a drizzle of {ingredient}"
+        ],
+        "acid": [
+            "Make a bright vinaigrette with {ingredient}",
+            "Add {ingredient} to soups for balance",
+            "Marinate proteins with {ingredient}",
+            "Finish roasted vegetables with {ingredient}"
+        ],
+        "general": [
+            "Quick skillet with {ingredient} and vegetables",
+            "Roasted {ingredient} with olive oil and herbs",
+            "Simple bowl with {ingredient} and rice",
+            "{ingredient} soup with garlic and broth"
+        ]
+    }
+
+    templates = idea_templates.get(category, idea_templates["general"])
+    idea_count = 2 if len(templates) >= 2 else len(templates)
+    ideas = rng.sample(templates, idea_count)
+    ingredient_title = ingredient.title()
+    ideas_text = "\n".join(f"- {tmpl.format(ingredient=ingredient_title)}" for tmpl in ideas)
+
+    return (
+        f"Substitutes for {ingredient_title}\n\n"
+        f"{substitutes_text}\n\n"
+        f"Quick recipe ideas\n"
+        f"{ideas_text}"
+    )
 
 # -------------------------
 # Weekly Meal Plan
 # -------------------------
 def meal_plan():
-    return """
-📅 Simple Weekly Meal Plan
+    rng = random.SystemRandom()
 
-Monday – Chicken Stir Fry  
-Tuesday – Garlic Butter Pasta  
-Wednesday – Fried Rice  
-Thursday – Grilled Chicken Salad  
-Friday – Vegetable Stir Fry  
-Saturday – Homemade Pizza  
-Sunday – Soup and Sandwich
+    base_pool = [
+        "Garlic Lemon Chicken",
+        "Veggie Stir-Fry",
+        "Tomato Basil Pasta",
+        "Beef and Broccoli Bowl",
+        "Shrimp Rice Bowl",
+        "Sheet-Pan Sausage and Veg",
+        "Turkey Chili",
+        "Tofu Grain Bowl",
+        "Salmon with Roasted Veg",
+        "Chicken Fajita Wraps",
+        "Veggie Fried Rice",
+        "Greek Salad with Pita",
+        "Chickpea Curry",
+        "BBQ Chicken Bowl",
+        "Roasted Veggie Pasta",
+        "Bean and Cheese Quesadillas",
+        "Chicken Soup",
+        "Stir-Fry Noodles",
+        "Stuffed Peppers",
+        "Veggie Burrito Bowl"
+    ]
+
+    vegan_pool = [
+        "Chickpea Curry",
+        "Tofu Stir-Fry",
+        "Lentil Stew",
+        "Veggie Buddha Bowl",
+        "Roasted Veggie Pasta",
+        "Black Bean Tacos",
+        "Mushroom Fried Rice",
+        "Sweet Potato Chili",
+        "Quinoa Veggie Bowl",
+        "Coconut Veggie Soup",
+        "Sesame Noodle Bowl",
+        "Veggie Burrito Bowl"
+    ]
+
+    vegetarian_pool = [
+        "Caprese Pasta",
+        "Veggie Omelet",
+        "Spinach and Feta Wrap",
+        "Mushroom Risotto",
+        "Cheese Quesadillas",
+        "Tomato Basil Pasta",
+        "Greek Salad with Pita",
+        "Veggie Fried Rice",
+        "Paneer Stir-Fry",
+        "Eggplant Parmesan",
+        "Veggie Burrito Bowl",
+        "Potato and Pepper Skillet"
+    ]
+
+    keto_pool = [
+        "Garlic Butter Chicken",
+        "Zucchini Noodles with Pesto",
+        "Beef Stir-Fry",
+        "Salmon with Asparagus",
+        "Cauliflower Fried Rice",
+        "Egg and Spinach Skillet",
+        "Chicken Salad Lettuce Wraps",
+        "Pork Chop with Greens",
+        "Shrimp and Broccoli",
+        "Turkey Lettuce Wraps",
+        "Cheesy Cauliflower Bake",
+        "Zucchini Beef Skillet"
+    ]
+
+    gluten_free_pool = [
+        "Grilled Chicken with Rice",
+        "Shrimp Rice Bowl",
+        "Salmon with Roasted Veg",
+        "Beef and Broccoli Bowl",
+        "Stuffed Peppers",
+        "Veggie Fried Rice",
+        "Turkey Chili",
+        "Chicken Soup",
+        "Quinoa Veggie Bowl",
+        "Cauliflower Fried Rice",
+        "Potato and Pepper Skillet",
+        "Chickpea Curry"
+    ]
+
+    pool = base_pool
+    if "Vegan" in diet:
+        pool = vegan_pool
+    elif "Vegetarian" in diet:
+        pool = vegetarian_pool
+    elif "Keto" in diet:
+        pool = keto_pool
+    elif "Gluten Free" in diet:
+        pool = gluten_free_pool
+
+    if len(pool) < 7:
+        pool = base_pool
+
+    picks = rng.sample(pool, 7) if len(pool) >= 7 else [rng.choice(pool) for _ in range(7)]
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    header = "Simple Weekly Meal Plan"
+    if diet:
+        header += f" ({', '.join(diet)})"
+
+    lines = "\n".join(f"- {day}: {meal}" for day, meal in zip(days, picks))
+    return f"""
+{header}
+
+{lines}
 """
 
 # -------------------------
 # Recipe Image
 # -------------------------
 def get_recipe_image(recipe_name):
+    if not recipe_name:
+        return "https://images.unsplash.com/photo-1495195134817-aeb325a55b65"
     images = {
         "chicken": "https://images.unsplash.com/photo-1604908177522-040cbe7c5a67",
         "pasta": "https://images.unsplash.com/photo-1551183053-bf91a1d81141",
         "stir fry": "https://images.unsplash.com/photo-1604908177261-8f3ec5d5b3c2",
-        "salad": "https://images.unsplash.com/photo-1546069901-ba9599a7e63"
+        "salad": "https://images.unsplash.com/photo-1546069901-ba9599a7e63",
+        "beef": "https://images.unsplash.com/photo-1544025162-d76694265947",
+        "pork": "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
+        "shrimp": "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
+        "fish": "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
+        "tofu": "https://images.unsplash.com/photo-1473093226795-af9932fe5856",
+        "rice": "https://images.unsplash.com/photo-1604908177261-8f3ec5d5b3c2"
     }
+    name = recipe_name.lower()
     for key in images:
-        if key in recipe_name.lower():
+        if key in name:
             return images[key]
     return "https://images.unsplash.com/photo-1495195134817-aeb325a55b65"
 
@@ -950,26 +1371,42 @@ Tip: Check your pantry before shopping!
 # -------------------------
 if mode == "Generate Recipe":
     st.write("## 🧾 Enter Ingredients")
-    ingredients = st.text_input("Example: chicken, garlic, rice, broccoli")
+    ingredients = st.text_input(
+        "Ingredients",
+        help="Separate items with commas. Example: chicken, garlic, rice, broccoli."
+    )
     if st.button("Generate Recipe"):
-        recipe = generate_recipe(ingredients)
-        image = get_recipe_image(ingredients)
-        st.markdown('<div class="recipe-card">', unsafe_allow_html=True)
-        st.image(image, use_container_width=True, caption="🍽 Your Dish Preview")
-        st.markdown(recipe)
-        st.markdown(nutrition_estimate(ingredients))
-        st.markdown(grocery_list(ingredients))
-        st.markdown('</div>', unsafe_allow_html=True)
-        st.success("Recipe generated by Cook de Staku!")
+        recipe_text, signature, recipe_name = generate_recipe(ingredients)
+        last_signature = st.session_state.get("last_recipe_signature")
+        attempts = 0
+        while signature and signature == last_signature and attempts < 2:
+            recipe_text, signature, recipe_name = generate_recipe(ingredients)
+            attempts += 1
+        st.session_state.last_recipe_signature = signature
+
+        if not signature:
+            st.warning(recipe_text)
+        else:
+            image = get_recipe_image(recipe_name or ingredients)
+            st.markdown('<div class="recipe-card">', unsafe_allow_html=True)
+            st.image(image, use_container_width=True, caption="Your Dish Preview")
+            st.markdown(recipe_text)
+            st.markdown(nutrition_estimate(ingredients))
+            st.markdown(grocery_list(ingredients))
+            st.markdown('</div>', unsafe_allow_html=True)
+            st.success("Recipe generated by Cook de Staku!")
 
 elif mode == "Ingredient Substitute":
     st.write("## 🔄 Ingredient Substitute")
-    question = st.text_input("Example: What can I use instead of eggs?")
+    question = st.text_input(
+        "Ingredient to substitute",
+        help="Example: What can I use instead of eggs?"
+    )
     if st.button("Find Substitute"):
         response = substitute_ingredient(question)
         st.markdown('<div class="botbox">', unsafe_allow_html=True)
         st.write("👨‍🍳 Cook de Staku AI:")
-        st.write(response)
+        st.markdown(response)
         st.markdown('</div>', unsafe_allow_html=True)
 
 elif mode == "Meal Planner":
@@ -977,7 +1414,7 @@ elif mode == "Meal Planner":
     if st.button("Generate Meal Plan"):
         plan = meal_plan()
         st.markdown('<div class="recipe-card">', unsafe_allow_html=True)
-        st.write(plan)
+        st.markdown(plan)
         st.markdown('</div>', unsafe_allow_html=True)
 
 # -------------------------
@@ -1008,16 +1445,23 @@ user_chat = st.chat_input("Ask anything about cooking or recipes...")
 
 if user_chat:
     st.session_state.chat_history.append(("user", user_chat))
-    
+
     persona_name, persona_icon = random.choice(list(personas.items()))
-    
+
     if "substitute" in user_chat.lower():
         response = substitute_ingredient(user_chat)
     elif "meal plan" in user_chat.lower():
         response = meal_plan()
     else:
-        response = generate_recipe(user_chat)
-    
+        recipe_text, signature, _ = generate_recipe(user_chat)
+        last_chat_signature = st.session_state.get("last_chat_signature")
+        attempts = 0
+        while signature and signature == last_chat_signature and attempts < 2:
+            recipe_text, signature, _ = generate_recipe(user_chat)
+            attempts += 1
+        st.session_state.last_chat_signature = signature
+        response = recipe_text
+
     st.session_state.chat_history.append(("assistant", persona_name, persona_icon, response))
 
 for message in st.session_state.chat_history:
@@ -1027,4 +1471,4 @@ for message in st.session_state.chat_history:
     else:
         _, persona_name, persona_icon, text = message
         with st.chat_message("assistant"):
-            st.markdown(f"**{persona_icon} {persona_name}:** {text}")
+            st.markdown(f"**{persona_icon} {persona_name}:**\n\n{text}")
