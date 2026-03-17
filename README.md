@@ -1,6 +1,6 @@
-﻿# 🍳 Cook de Staku – AI-Powered Smart Recipe Assistant
+﻿# 🍳 Recipe de SUCKERPUNCH – AI-Powered Smart Recipe Assistant
 
-**Cook de Staku** is a modern, interactive cooking assistant built with **Streamlit**. It helps home cooks generate recipes, plan meals, substitute ingredients, and receive smart cooking guidance with a bold Lakers-inspired UI.
+**Recipe de SUCKERPUNCH** is a modern, interactive cooking assistant built with **Streamlit**. It helps home cooks generate recipes, plan meals, substitute ingredients, and receive smart cooking guidance with a bold Lakers-inspired dark-mode UI.
 
 ---
 
@@ -15,15 +15,15 @@
 - **Auto grocery list** from your ingredients
 - **Recipe images** for quick visual inspiration
 - **Chat with Anthony Edwards & LeBron James** personas
-- **Lakers Light / Lakers Dark** appearance toggle
+- **Lakers dark-mode** appearance theme
 
 ---
 
 ## 🚀 Installation
 
 ```bash
-git clone https://github.com/yourusername/cook-de-staku.git
-cd cook-de-staku
+git clone https://github.com/yourusername/recipe-de-suckerpunch.git
+cd recipe-de-suckerpunch
 ```
 
 Create and activate a virtual environment (recommended).
@@ -68,7 +68,7 @@ http://localhost:8501
 
 1. Choose a mode: Recipe Generator, Ingredient Substitute, or Meal Planner.
 2. Enter ingredients or a question.
-3. Adjust settings in the sidebar for servings, skill level, diet, and appearance.
+3. Adjust settings in the sidebar for servings, skill level, diet, and persona.
 4. Use **Regenerate** for a fresh recipe with the same ingredients.
 
 ---

@@ -1,10 +1,10 @@
-# ChefDaze AI Prompt Testing Script
+# Recipe de SUCKERPUNCH Prompt Testing Script
 # Team Summer Daze
 
 def chef_daze_prompt(ingredients_input):
 
     system_prompt = """
-You are ChefDaze AI, a smart recipe coach for home cooks.
+You are Recipe de SUCKERPUNCH AI, a smart recipe coach for home cooks.
 
 Your responsibilities:
 - Suggest recipes based on ingredients
@@ -106,7 +106,7 @@ Best used for:
 
     else:
         response = """
-ChefDaze AI Suggestion:
+Recipe de SUCKERPUNCH Suggestion:
 
 Try entering ingredients like:
 - chicken, garlic, rice
@@ -118,7 +118,7 @@ I will generate a recipe for you.
 
     return f"""
 ===============================
-ChefDaze AI Prompt Simulation
+Recipe de SUCKERPUNCH Prompt Simulation
 ===============================
 
 SYSTEM PROMPT:
@@ -147,7 +147,7 @@ tests = [
 ]
 
 
-print("\n====== CHEFDAZE AI PROMPT TESTS ======\n")
+print("\n====== RECIPE DE SUCKERPUNCH AI PROMPT TESTS ======\n")
 
 for i, test in enumerate(tests, 1):
 
