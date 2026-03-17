@@ -19,6 +19,17 @@
 
 ---
 
+## How the AI Works
+
+This app uses AI-style logic (no external LLM calls in the current version):
+
+- Parses ingredients with lightweight rules
+- Chooses recipe profiles and methods from curated templates
+- Applies diet swaps for Vegan, Vegetarian, Keto, and Gluten Free
+- Suggests substitutions from a curated ingredient catalog
+- Adds randomized variations for freshness
+- Styles responses with Anthony Edwards or LeBron James personas
+
 ## 🚀 Installation
 
 ```bash
@@ -118,3 +129,5 @@ This project is licensed under the **MIT License**.
 - Multi-language support
 - Voice cooking assistant
 - Grocery delivery integration
+
+

@@ -364,14 +364,44 @@ persona_choice = st.sidebar.selectbox(
     ["Random", "Anthony Edwards", "LeBron James"]
 )
 
+st.sidebar.write("### About the AI")
+with st.sidebar.expander("How the AI works"):
+    st.markdown(
+        "- Parses ingredients with lightweight rules\n"
+        "- Picks recipe profiles and methods from curated templates\n"
+        "- Applies diet swaps for Vegan, Vegetarian, Keto, and Gluten Free\n"
+        "- Suggests substitutes from a curated ingredient catalog\n"
+        "- Adds randomized variations for freshness\n"
+        "- Styles responses with Anthony Edwards or LeBron James personas"
+    )
+
 st.sidebar.write("### Quick Actions")
 if st.sidebar.button("Clear Chat"):
     st.session_state.chat_history = []
+    st.rerun()
 if st.sidebar.button("Reset Ingredients"):
     st.session_state.last_ingredients_used = ""
     st.session_state.ingredients_input = ""
+    st.rerun()
 if st.sidebar.button("Reset Recipe Memory"):
     st.session_state.signature_history = {}
+    st.rerun()
+
+st.sidebar.write("### Recent Chat History")
+recent_history = st.session_state.get("chat_history", [])
+recent_history = recent_history[-6:] if recent_history else []
+if not recent_history:
+    st.sidebar.caption("No recent chat yet.")
+else:
+    for entry in recent_history:
+        if entry[0] == "user":
+            st.sidebar.write(f"You: {entry[1]}")
+        else:
+            _, persona_name, _, text = entry
+            snippet = text.replace("\n", " ").strip()
+            if len(snippet) > 90:
+                snippet = snippet[:90].rstrip() + "..."
+            st.sidebar.write(f"{persona_name}: {snippet}")
 
 st.sidebar.write("---")
 st.sidebar.write("👨‍🍳 Team Summer Daze Members")
@@ -1702,9 +1732,7 @@ if mode == "Generate Recipe":
         if not signature:
             st.warning(recipe_text)
             return
-        image = get_recipe_image(recipe_name or ingredients_used)
         st.markdown('<div class="recipe-card">', unsafe_allow_html=True)
-        st.image(image, use_container_width=True, caption="Your Dish Preview")
         st.markdown(recipe_text)
         st.markdown(nutrition_estimate(effective_ingredients))
         st.markdown(grocery_list(effective_ingredients))
