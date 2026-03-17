@@ -14,26 +14,20 @@
 - **Nutrition estimates** (calories and protein)
 - **Auto grocery list** from your ingredients
 - **Chat with Anthony Edwards & LeBron James** personas
-- **Live Gemini LLM integration** (optional)
 - **Lakers dark-mode** appearance theme
 
 ---
 
 ## How the AI Works
 
-This app supports live LLM responses via Gemini and falls back to local logic when disabled:
+This app uses AI-style logic (no live LLM calls):
 
-- Gemini handles recipes, substitutes, meal plans, and chat when `GEMINI_API_KEY` is set
-- Local rules handle everything when Gemini is off
-- Diet swaps apply for Vegan, Vegetarian, Keto, and Gluten Free
-- Responses are styled with Anthony Edwards or LeBron James personas
-
-### Gemini Setup
-
-1. Get a Gemini API key from Google AI Studio.
-2. Set `GEMINI_API_KEY` in your environment or `.env`.
-3. (Optional) Set `GEMINI_MODEL` (default: `gemini-3-flash-preview`).
-
+- Parses ingredients with lightweight rules
+- Chooses recipe profiles and methods from curated templates
+- Applies diet swaps for Vegan, Vegetarian, Keto, and Gluten Free
+- Suggests substitutions from a curated ingredient catalog
+- Adds randomized variations for freshness
+- Styles responses with Anthony Edwards or LeBron James personas
 
 ## 🚀 Installation
 
@@ -84,7 +78,7 @@ http://localhost:8501
 
 1. Choose a mode: Recipe Generator, Ingredient Substitute, or Meal Planner.
 2. Enter ingredients or a question.
-3. Adjust settings in the sidebar for servings, skill level, diet, persona, and AI engine.
+3. Adjust settings in the sidebar for servings, skill level, diet, and persona.
 4. Use **Regenerate** for a fresh recipe with the same ingredients.
 
 ---
@@ -129,7 +123,7 @@ This project is licensed under the **MIT License**.
 
 ## 🔮 Future Ideas
 
-- Gemini tool expansion (images, pantry memory, shopping links)
+- Optional LLM integration (if desired)
 - Personalized dietary recommendations
 - Multi-language support
 - Voice cooking assistant
