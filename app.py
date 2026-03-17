@@ -1,7 +1,18 @@
-﻿import streamlit as st
+﻿import hashlib
+import os
 import random
 import re
+import streamlit as st
+from dotenv import load_dotenv
 
+try:
+    from google import genai
+except ImportError:
+    genai = None
+
+load_dotenv()
+
+GEMINI_DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
 
 # -------------------------
 # PAGE CONFIG
@@ -364,11 +375,42 @@ persona_choice = st.sidebar.selectbox(
     ["Random", "Anthony Edwards", "LeBron James"]
 )
 
+gemini_api_key = os.getenv("GEMINI_API_KEY", "").strip()
+gemini_ready = genai is not None and bool(gemini_api_key)
+st.sidebar.write("### AI Engine")
+engine_options = ["Gemini (Live)", "Local Logic"]
+default_engine_index = 0 if gemini_ready else 1
+ai_engine = st.sidebar.selectbox(
+    "Response Engine",
+    engine_options,
+    index=default_engine_index
+)
+if ai_engine == "Gemini (Live)":
+    gemini_model = st.sidebar.text_input(
+        "Gemini model",
+        value=GEMINI_DEFAULT_MODEL,
+        help="Override with GEMINI_MODEL in your environment if needed."
+    )
+    if genai is None:
+        st.sidebar.warning("Install `google-genai` to enable Gemini responses.")
+    elif not gemini_api_key:
+        st.sidebar.warning("Set GEMINI_API_KEY to enable Gemini responses.")
+    else:
+        st.sidebar.success("Gemini live mode enabled.")
+        last_error = st.session_state.get("gemini_error", "")
+        if last_error:
+            st.sidebar.warning(f"Gemini error: {last_error}")
+else:
+    gemini_model = GEMINI_DEFAULT_MODEL
+    st.sidebar.caption("Using local logic (offline).")
+
 st.sidebar.write("### About the AI")
 with st.sidebar.expander("How the AI works"):
     st.markdown(
+        "- Uses Gemini for live LLM responses when enabled\n"
+        "- Falls back to local recipe logic when Gemini is off\n"
+        "- Set GEMINI_API_KEY in your environment to enable Gemini\n"
         "- Parses ingredients with lightweight rules\n"
-        "- Picks recipe profiles and methods from curated templates\n"
         "- Applies diet swaps for Vegan, Vegetarian, Keto, and Gluten Free\n"
         "- Suggests substitutes from a curated ingredient catalog\n"
         "- Adds randomized variations for freshness\n"
@@ -413,6 +455,97 @@ st.sidebar.write("---")
 st.sidebar.write("🏀 Recipe de SUCKERPUNCH Response Team")
 st.sidebar.write("👤 Anthony Edwards")
 st.sidebar.write("👤 LeBron James")
+
+# -------------------------
+# GEMINI HELPERS
+# -------------------------
+def gemini_enabled():
+    return ai_engine == "Gemini (Live)" and gemini_ready
+
+
+def gemini_generate_text(prompt):
+    if not gemini_enabled():
+        return None, "Gemini is not enabled."
+    try:
+        client = genai.Client()
+        response = client.models.generate_content(
+            model=gemini_model,
+            contents=prompt
+        )
+        text = getattr(response, "text", None)
+        if not text:
+            return None, "Empty response from Gemini."
+        st.session_state["gemini_error"] = ""
+        return text.strip(), None
+    except Exception as exc:
+        st.session_state["gemini_error"] = str(exc)
+        return None, str(exc)
+
+
+def gemini_recipe_prompt(ingredients):
+    diet_text = ", ".join(diet) if diet else "None"
+    return f"""
+You are Recipe de SUCKERPUNCH, a Lakers-themed cooking assistant.
+Create a concise recipe in Markdown using these ingredients: {ingredients}
+You may add common pantry items if needed. Respect these preferences: {diet_text}.
+
+Format exactly like this:
+### 🥗 Smart Recipe for: <dish name>
+Serving Size: {servings}
+Skill Level: {skill_level}
+Diet Preferences: {diet_text}
+
+Ingredients:
+- item
+
+Instructions:
+1. step
+
+Optional Tips:
+- tip
+"""
+
+
+def gemini_substitute_prompt(question):
+    return f"""
+You are Recipe de SUCKERPUNCH, a cooking assistant.
+Answer this substitution request clearly and concisely:
+{question}
+
+Format:
+Substitutes for <ingredient>
+- item
+
+Quick recipe ideas
+- idea
+"""
+
+
+def gemini_meal_plan_prompt():
+    diet_text = ", ".join(diet) if diet else "None"
+    return f"""
+You are Recipe de SUCKERPUNCH, a cooking assistant.
+Create a 7-day meal plan (Monday to Sunday).
+Diet Preferences: {diet_text}
+Format as bullet list: - Monday: Meal
+"""
+
+
+def gemini_chat_prompt(message, persona_name):
+    persona_style = persona_profiles.get(persona_name, {}).get(
+        "intro",
+        "Chef persona activated."
+    )
+    diet_text = ", ".join(diet) if diet else "None"
+    return f"""
+You are Recipe de SUCKERPUNCH, a Lakers-themed cooking assistant.
+Persona style: {persona_style}
+Skill Level: {skill_level}
+Diet Preferences: {diet_text}
+
+User message:
+{message}
+"""
 
 # -------------------------
 # SMART AI RECIPE FUNCTION
@@ -1327,6 +1460,13 @@ def detect_category(ingredient):
 
 
 def substitute_ingredient(question):
+    if gemini_enabled():
+        prompt = gemini_substitute_prompt(question)
+        response, error = gemini_generate_text(prompt)
+        if response:
+            return response
+        st.session_state["gemini_error"] = error or "Unknown Gemini error"
+
     ingredient = extract_ingredient_name(question)
     if not ingredient:
         return "Please enter an ingredient you want to substitute."
@@ -1490,6 +1630,13 @@ def substitute_ingredient(question):
 # Weekly Meal Plan
 # -------------------------
 def meal_plan():
+    if gemini_enabled():
+        prompt = gemini_meal_plan_prompt()
+        response, error = gemini_generate_text(prompt)
+        if response:
+            return response
+        st.session_state["gemini_error"] = error or "Unknown Gemini error"
+
     rng = random.SystemRandom()
 
     base_pool = [
@@ -1692,6 +1839,16 @@ def push_signature(key, signature, max_len=6):
 
 def generate_unique_recipe(ingredients, attempts=12):
     key = ingredients.strip().lower()
+    if not key:
+        return "Please enter a few ingredients so I can build a recipe.", None, None, None
+    if gemini_enabled():
+        prompt = gemini_recipe_prompt(ingredients)
+        recipe_text, error = gemini_generate_text(prompt)
+        if recipe_text:
+            signature = hashlib.sha256(recipe_text.encode("utf-8")).hexdigest()[:12]
+            push_signature(key, signature)
+            return recipe_text, signature, None, ingredients
+        st.session_state["gemini_error"] = error or "Unknown Gemini error"
     recipe_text, signature, recipe_name, effective_ingredients = generate_recipe(ingredients)
     history = get_signature_history(key)
     tries = 0
@@ -1819,13 +1976,25 @@ if user_chat:
         persona_name = persona_choice
     persona_icon = persona_profiles[persona_name]["icon"]
 
-    if "substitute" in user_chat.lower():
-        response = substitute_ingredient(user_chat)
-    elif "meal plan" in user_chat.lower():
-        response = meal_plan()
+    if gemini_enabled():
+        if "substitute" in user_chat.lower():
+            response = substitute_ingredient(user_chat)
+        elif "meal plan" in user_chat.lower():
+            response = meal_plan()
+        else:
+            prompt = gemini_chat_prompt(user_chat, persona_name)
+            response, error = gemini_generate_text(prompt)
+            if not response:
+                st.session_state["gemini_error"] = error or "Unknown Gemini error"
+                response, _, _, _ = generate_recipe(user_chat)
     else:
-        recipe_text, _, _, _ = generate_unique_recipe(user_chat)
-        response = recipe_text
+        if "substitute" in user_chat.lower():
+            response = substitute_ingredient(user_chat)
+        elif "meal plan" in user_chat.lower():
+            response = meal_plan()
+        else:
+            recipe_text, _, _, _ = generate_unique_recipe(user_chat)
+            response = recipe_text
 
     response = apply_persona_flair(persona_name, response)
     st.session_state.chat_history.append(("assistant", persona_name, persona_icon, response))
