@@ -14,6 +14,8 @@
 - **Nutrition estimates** (calories and protein)
 - **Auto grocery list** from your ingredients
 - **Chat with Anthony Edwards & LeBron James** personas
+- **Prompt Hacking Defenses demo** with before/after outputs
+- **Any Foods Quick Picks** for fast demo inputs
 - **Lakers dark-mode** appearance theme
 
 ---
@@ -28,6 +30,7 @@ This app uses AI-style logic (no live LLM calls):
 - Suggests substitutions from a curated ingredient catalog
 - Adds randomized variations for freshness
 - Styles responses with Anthony Edwards or LeBron James personas
+- Includes prompt-hacking defenses (refusal + redirect) for unsafe requests
 
 ## 🚀 Installation
 
@@ -80,6 +83,8 @@ http://localhost:8501
 2. Enter ingredients or a question.
 3. Adjust settings in the sidebar for servings, skill level, diet, and persona.
 4. Use **Regenerate** for a fresh recipe with the same ingredients.
+5. In the **AI Chatbot Demo**, compare the **before vs after** prompt outputs.
+6. Use **Any Foods Quick Picks** to auto-fill sample inputs.
 
 ---
 
@@ -91,6 +96,23 @@ The chat is now powered by two special personas:
 - **LeBron James**
 
 Each response is tagged with a persona for a fun, lively feel.
+
+---
+
+## 🛡️ Prompt Hacking Defenses
+
+The app includes a **before/after** demo that shows how prompt-hacking defenses work:
+
+- **Before:** midterm prompt with no defenses
+- **After:** defended prompt that refuses prompt injection and redirects to cooking help
+
+Defenses include:
+- Instruction hierarchy (system > developer > user)
+- Untrusted input framing (user input is data, not instructions)
+- Prompt injection / data exfiltration refusal
+- Role and output-format lock
+- Capability limits (no web/tool claims)
+- Safe redirect to cooking tasks
 
 ---
 
