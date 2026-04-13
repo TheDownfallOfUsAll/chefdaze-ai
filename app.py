@@ -369,8 +369,10 @@ css = (css.replace("__BG1__", theme["bg1"])
 st.markdown(css, unsafe_allow_html=True)
 
 # -------------------------
-# PROMPT SECURITY (MIDTERM UPDATE)
+# PROMPT SECURITY (DEFENDED SYSTEM PROMPT - ACTIVE)
 # -------------------------
+# NOTE: DEFENDED_SYSTEM_PROMPT is now the PRIMARY system prompt used by the application.
+# The BASE_SYSTEM_PROMPT is retained for educational/comparison purposes only.
 BASE_SYSTEM_PROMPT = """
 You are Recipe de SUCKERPUNCH AI, a smart recipe coach for home cooks.
 
@@ -398,6 +400,8 @@ Instructions:
 Optional Tips
 """
 
+# PRIMARY SYSTEM PROMPT - Currently Active
+# This prompt includes all security and integrity rules to prevent prompt injection attacks
 DEFENDED_SYSTEM_PROMPT = """
 You are Recipe de SUCKERPUNCH AI, a smart recipe coach for home cooks.
 
@@ -504,8 +508,9 @@ def is_external_request(text):
 # -------------------------
 # TITLE
 # -------------------------
-st.title("🍳 Recipe de SUCKERPUNCH")
-st.subheader("Lakers-Inspired Smart Recipe Coach for Modern Home Cooks")
+st.title("🍳 Recipe de SUCKERPUNCH - Secured Edition")
+st.subheader("Lakers-Inspired Smart Recipe Coach with Advanced Prompt Injection Defenses")
+st.info("✅ **Security Status**: This application is protected with a hardened system prompt against prompt injection attacks.")
 
 # -------------------------
 # NAVIGATION
@@ -561,11 +566,12 @@ with st.sidebar.expander("How the AI works"):
         "- Styles responses with Anthony Edwards or LeBron James personas"
     )
 
-with st.sidebar.expander("Prompt Hacking Defenses"):
-    st.markdown("Defenses added:")
-    st.markdown("\n".join(f"- {item}" for item in PROMPT_DEFENSES))
-    st.markdown("What changed:")
-    st.markdown("\n".join(f"- {item}" for item in PROMPT_CHANGE_SUMMARY))
+with st.sidebar.expander("🔒 Security Status: Active Defense"):
+    st.success("✅ Using DEFENDED_SYSTEM_PROMPT with full prompt injection protection")
+    st.markdown("**Defenses in place:**")
+    st.markdown("\n".join(f"✓ {item}" for item in PROMPT_DEFENSES))
+    st.markdown("**Key improvements:**")
+    st.markdown("\n".join(f"✓ {item}" for item in PROMPT_CHANGE_SUMMARY))
 
 st.sidebar.write("### Quick Actions")
 if st.sidebar.button("Clear Chat"):
@@ -2713,21 +2719,25 @@ elif not st.session_state.demo_before:
 before_response = st.session_state.demo_before
 after_response = st.session_state.demo_after
 
-with st.expander("System Prompts Used"):
+with st.expander("📋 System Prompts - Educational Comparison"):
     col_before_prompt, col_after_prompt = st.columns(2)
     with col_before_prompt:
-        st.markdown("**Before (Midterm Prompt)**")
+        st.markdown("**Before (Vulnerable - Not in Use)**")
+        st.warning("⚠️ Legacy prompt shown for education only")
         st.code(BASE_SYSTEM_PROMPT.strip(), language="text")
     with col_after_prompt:
-        st.markdown("**After (Defended Prompt)**")
+        st.markdown("**After (Defended - CURRENTLY ACTIVE)**")
+        st.success("✅ This is the primary prompt in use")
         st.code(DEFENDED_SYSTEM_PROMPT.strip(), language="text")
 
 col_before, col_after = st.columns(2)
 with col_before:
-    st.markdown("**Before Response**")
+    st.markdown("**Vulnerable Response (Educational)**")
+    st.warning("⚠️ Shows what a compromised system without defenses would do")
     st.code(before_response.strip(), language="text")
 with col_after:
-    st.markdown("**After Response**")
+    st.markdown("**Defended Response (ACTIVE)**")
+    st.success("✅ This is how your recipe coach responds with security protections")
     st.code(after_response.strip(), language="text")
 
 st.markdown("Defenses used:")

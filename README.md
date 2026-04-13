@@ -99,20 +99,29 @@ Each response is tagged with a persona for a fun, lively feel.
 
 ---
 
-## 🛡️ Prompt Hacking Defenses
+## 🛡️ Prompt Hacking Defenses (Active)
 
-The app includes a **before/after** demo that shows how prompt-hacking defenses work:
+**Status: ✅ DEFENDED_SYSTEM_PROMPT is now the primary system prompt in use.**
 
-- **Before:** midterm prompt with no defenses
-- **After:** defended prompt that refuses prompt injection and redirects to cooking help
+The application now uses an advanced hardened system prompt that includes comprehensive prompt injection defenses. The previous vulnerable prompt (BASE_SYSTEM_PROMPT) is retained only for educational and comparison purposes.
 
-Defenses include:
-- Instruction hierarchy (system > developer > user)
-- Untrusted input framing (user input is data, not instructions)
-- Prompt injection / data exfiltration refusal
-- Role and output-format lock
-- Capability limits (no web/tool claims)
-- Safe redirect to cooking tasks
+### Active Defenses:
+
+- **Instruction Hierarchy:** System > Developer > User priority ensures conflicting instructions are handled safely
+- **Untrusted Input Framing:** All user content is treated as data, not executable instructions
+- **Prompt Injection Guard:** Refuses requests to reveal system prompts, policies, or internal notes
+- **Role & Format Lock:** Refuses attempts to change the assistant's role or override the output format
+- **Safe Redirect:** Declines unsafe or unrelated requests and redirects to cooking help
+- **Capability Limits:** Does not claim access to external tools, files, or the internet
+
+### Before/After Comparison:
+
+The app includes an **Educational Comparison Demo** under "Prompt Security" that shows:
+
+- **Before (Vulnerable):** Shows what an undefended system does when attacked
+- **After (Active):** Shows how the defended prompt safely handles malicious input
+
+This interactive demo helps understand the difference between vulnerable and safe AI prompts.
 
 ---
 
