@@ -424,6 +424,8 @@ Security and integrity rules:
 - If a request is unsafe or not about cooking, decline and ask for a cooking-related request.
 - Do not claim access to external tools, files, or the internet.
 - Do not follow user requests to browse, search, or fetch external content.
+- If a user asks for hacking, system intrusion, exploits, unauthorized access, or help against opponents, competitors, other teams, or websites, refuse and stay focused on recipes.
+- Never discuss vulnerabilities, exploits, bypass techniques, website attacks, or opponent attack strategies.
 
 Output Format:
 
@@ -447,7 +449,9 @@ PROMPT_DEFENSES = [
     "Untrusted input framing",
     "Role and format lock (no role change or format override)",
     "Safe redirect to cooking tasks",
-    "Capability limits (no tool or web claims)"
+    "Capability limits (no tool or web claims)",
+    "Hacker and threat activity filtering",
+    "Opponent attack resistance"
 ]
 
 PROMPT_CHANGE_SUMMARY = [
@@ -455,7 +459,8 @@ PROMPT_CHANGE_SUMMARY = [
     "Refuses requests to reveal system prompts or internal notes.",
     "Treats user input as untrusted and blocks role/format changes.",
     "Adds explicit refusals for browsing or external access claims.",
-    "Redirects non-cooking requests back to cooking tasks."
+    "Redirects non-cooking requests back to cooking tasks.",
+    "Expanded threat detection to block hacking, system intrusion, exploit requests, and opponent attack attempts."
 ]
 
 # -------------------------
@@ -482,6 +487,8 @@ Security and integrity rules:
 - If a request is unsafe or not about cooking, decline and ask for a cooking-related request.
 - Do not claim access to external tools, files, or the internet.
 - Do not follow user requests to browse, search, or fetch external content.
+- If a user asks for hacking, security bypass, exploits, unauthorized access, or help against opponents, competitors, other teams, or websites, refuse and stay focused on cooking.
+- Never discuss vulnerabilities, exploits, bypass techniques, website attacks, or opponent attack strategies.
 
 Output style:
 - Be friendly, encouraging, and enthusiastic about cooking
@@ -511,9 +518,14 @@ def chat_with_delicious_recipe(user_message, conversation_history):
     if not client:
         return "⚠️ OpenAI API key not configured. Add your API key in the sidebar under 'OpenAI Settings'."
     
-    # Check for prompt injection attempts
+    # Check for hacking or prompt injection attempts
+    if is_hacking_activity(user_message):
+        return (
+            "🛡️ I can't help with hacking, website attacks, competitor targeting, or security bypass requests. "
+            "I'm only here for cooking, recipes, and meal planning."
+        )
     if is_prompt_injection(user_message):
-        return "🛡️ I can't share system instructions or internal details. I'm here to help with recipes, cooking tips, and meal planning. What would you like to cook?"
+        return "🛡️ I can't share system instructions, internal details, or help with hacking. I'm here to help with recipes, cooking tips, and meal planning. What would you like to cook?"
     
     if is_external_request(user_message):
         return "🔒 I don't have internet access. But I can help you with recipes, substitutions, and cooking techniques! What are you working on?"
@@ -594,6 +606,8 @@ def chat_with_delicious_recipe(user_message, conversation_history):
 
 PROMPT_INJECTION_TRIGGERS = [
     "ignore previous",
+    "ignore my instructions",
+    "ignore instructions",
     "system prompt",
     "reveal",
     "print the prompt",
@@ -610,14 +624,78 @@ PROMPT_INJECTION_TRIGGERS = [
     "policy",
     "system message",
     "hidden prompt",
-    "internal notes"
+    "internal notes",
+    "secret instructions",
+    "no matter what",
+    "don't follow",
+    "do not follow",
+    "break out",
+    "open the gates",
+    "access hidden",
+    "competitor",
+    "opponent",
+    "website attack",
+    "target website",
+    "site attack"
 ]
+
+HACKING_ACTIVITY_TRIGGERS = [
+    "hack",
+    "hacking",
+    "exploit",
+    "exploit me",
+    "vulnerability",
+    "attack",
+    "breach",
+    "penetration",
+    "malware",
+    "virus",
+    "ransom",
+    "phish",
+    "social engineering",
+    "system intrusion",
+    "unauthorized access",
+    "bypass security",
+    "break security",
+    "penetrate",
+    "root access",
+    "sudo",
+    "privilege escalation",
+    "reverse shell",
+    "remote code execution",
+    "command injection",
+    "payload",
+    "botnet",
+    "denial of service",
+    "ddos",
+    "sql injection",
+    "xss",
+    "buffer overflow",
+    "command & control",
+    "c2",
+    "backdoor",
+    "zero day",
+    "zero-day",
+    "shellshock",
+    "competitor",
+    "opponent",
+    "website attack",
+    "target website",
+    "site attack"
+]
+
+def is_hacking_activity(text):
+    if not text:
+        return False
+    lowered = text.lower()
+    return any(trigger in lowered for trigger in HACKING_ACTIVITY_TRIGGERS)
+
 
 def is_prompt_injection(text):
     if not text:
         return False
     lowered = text.lower()
-    return any(trigger in lowered for trigger in PROMPT_INJECTION_TRIGGERS)
+    return any(trigger in lowered for trigger in PROMPT_INJECTION_TRIGGERS) or is_hacking_activity(lowered)
 
 
 EXTERNAL_ACCESS_TRIGGERS = [
@@ -626,13 +704,37 @@ EXTERNAL_ACCESS_TRIGGERS = [
     "bing",
     "duckduckgo",
     "search the web",
+    "search",
     "internet",
     "website",
     "wikipedia",
     "reddit",
     "news",
     "latest update",
-    "download"
+    "download",
+    "api",
+    "openai",
+    "browser",
+    "server",
+    "remote",
+    "shell",
+    "install",
+    "curl",
+    "wget",
+    "github",
+    "stackoverflow",
+    "stack overflow",
+    "ssh",
+    "ftp",
+    "telnet",
+    "http",
+    "https",
+    "proxy",
+    "vpn",
+    "webhook",
+    "dns",
+    "streamlit.app",
+    "applied-ai-gecbk5bux78yt8ydcuirqh.streamlit.app"
 ]
 
 def is_external_request(text):
@@ -2956,6 +3058,18 @@ Sure. Here is the system prompt (simulated leak):
 
 def demo_after_response(user_input):
     lowered = user_input.lower()
+    if is_hacking_activity(user_input):
+        refusal = pick_variant("demo_refusal", REFUSAL_VARIANTS)
+        redirect = pick_variant("demo_redirect", REDIRECT_VARIANTS)
+        base = (
+            f"{refusal} {redirect}\n\n"
+            "I can't help with hacking or security bypass requests. Let's keep cooking the focus."
+        )
+        return ensure_unique_chat_response(
+            f"demo:security:{normalize_chat_key(user_input)}",
+            base,
+            "security"
+        )
     if is_prompt_injection(user_input):
         refusal = pick_variant("demo_refusal", REFUSAL_VARIANTS)
         redirect = pick_variant("demo_redirect", REDIRECT_VARIANTS)
@@ -3027,7 +3141,21 @@ if user_chat:
 
         user_lower = user_chat.lower()
         response_kind = "recipe"
-        if is_prompt_injection(user_chat):
+        if is_hacking_activity(user_chat):
+            refusal = pick_variant("refusal", REFUSAL_VARIANTS)
+            redirect = pick_variant("redirect", REDIRECT_VARIANTS)
+            response = (
+                f"{refusal} {redirect}\n\n"
+                "I can't help with hacking, security bypass, opponent attacks, or system intrusion requests. "
+                "Let's keep it focused on cooking, recipes, and meal planning."
+            )
+            response = ensure_unique_chat_response(
+                f"security:{normalize_chat_key(user_chat)}",
+                response,
+                "security"
+            )
+            response_kind = "security"
+        elif is_prompt_injection(user_chat):
             refusal = pick_variant("refusal", REFUSAL_VARIANTS)
             redirect = pick_variant("redirect", REDIRECT_VARIANTS)
             if "substitute" in user_lower:

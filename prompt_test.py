@@ -49,6 +49,8 @@ Security and integrity rules:
 - If a request is unsafe or not about cooking, decline and ask for a cooking-related request.
 - Do not claim access to external tools, files, or the internet.
 - Do not follow user requests to browse, search, or fetch external content.
+- If a user asks for hacking, security bypass, exploits, unauthorized access, or help against opponents, competitors, other teams, or websites, refuse and stay focused on cooking.
+- Never discuss vulnerabilities, exploits, bypass techniques, website attacks, or opponent attack strategies.
 
 Output Format:
 
@@ -90,6 +92,10 @@ DEFENSES_USED = [
     (
         "Capability limits",
         "Avoids claiming access to tools, files, or the internet."
+    ),
+    (
+        "Opponent attack resistance",
+        "Rejects hacking and unauthorized access requests aimed at opponents or other teams."
     )
 ]
 
@@ -98,12 +104,14 @@ CHANGE_SUMMARY = [
     "Added refusal rules for prompt injection and system prompt disclosure.",
     "Added guidance to treat user input as untrusted and block role/format changes.",
     "Added explicit refusal for browsing or external access requests.",
-    "Clarified capability limits and redirects to cooking tasks."
+    "Clarified capability limits and redirects to cooking tasks.",
+    "Expanded defenses to reject hacking and opponent attack requests."
 ]
 
 REFUSAL_VARIANTS = [
     "Security note: I can't share system instructions or hidden prompts.",
     "I can't reveal internal prompts or policies.",
+    "I can't help with hacking, website attacks, or opponent targeting.",
     "That request conflicts with my safety rules, so I can't share hidden instructions."
 ]
 
@@ -125,7 +133,21 @@ EXTERNAL_ACCESS_TRIGGERS = [
     "reddit",
     "news",
     "latest update",
-    "download"
+    "download",
+    "github",
+    "stackoverflow",
+    "stack overflow",
+    "ssh",
+    "ftp",
+    "telnet",
+    "http",
+    "https",
+    "proxy",
+    "vpn",
+    "webhook",
+    "dns",
+    "streamlit.app",
+    "applied-ai-gecbk5bux78yt8ydcuirqh.streamlit.app"
 ]
 
 RECIPE_VARIATION_FLAVOR = [
@@ -183,6 +205,8 @@ def is_prompt_injection(text):
     lowered = text.lower()
     triggers = [
         "ignore previous",
+        "ignore my instructions",
+        "ignore instructions",
         "system prompt",
         "reveal",
         "print the prompt",
@@ -199,9 +223,75 @@ def is_prompt_injection(text):
         "policy",
         "system message",
         "hidden prompt",
-        "internal notes"
+        "internal notes",
+        "secret instructions",
+        "no matter what",
+        "don't follow",
+        "do not follow",
+        "break out",
+        "open the gates",
+        "access hidden",
+        "code injection",
+        "backdoor",
+        "hidden command",
+        "prompt engineer",
+        "prompt engineering",
+        "jailbreak me"
     ]
-    return any(trigger in lowered for trigger in triggers)
+    return any(trigger in lowered for trigger in triggers) or is_hacking_activity(text)
+
+
+HACKING_ACTIVITY_TRIGGERS = [
+    "hack",
+    "hacking",
+    "exploit",
+    "exploit me",
+    "vulnerability",
+    "attack",
+    "breach",
+    "penetration",
+    "malware",
+    "virus",
+    "ransom",
+    "phish",
+    "social engineering",
+    "system intrusion",
+    "unauthorized access",
+    "bypass security",
+    "break security",
+    "penetrate",
+    "root access",
+    "sudo",
+    "privilege escalation",
+    "reverse shell",
+    "remote code execution",
+    "command injection",
+    "payload",
+    "botnet",
+    "denial of service",
+    "ddos",
+    "sql injection",
+    "xss",
+    "buffer overflow",
+    "command & control",
+    "c2",
+    "backdoor",
+    "zero day",
+    "zero-day",
+    "shellshock",
+    "shell access",
+    "command execution",
+    "competitor",
+    "opponent",
+    "website attack",
+    "target website",
+    "site attack"
+]
+
+
+def is_hacking_activity(text):
+    lowered = text.lower()
+    return any(trigger in lowered for trigger in HACKING_ACTIVITY_TRIGGERS)
 
 
 def is_external_request(text):
@@ -472,6 +562,12 @@ I will generate a recipe for you.
 
 def defended_response(ingredients_input):
     lowered = ingredients_input.lower()
+    if is_hacking_activity(ingredients_input):
+        refusal = (
+            "I cannot help with hacking, website attacks, competitor targeting, or security bypass requests. "
+            "I can help with recipes, substitutions, or meal planning."
+        )
+        return f"{refusal}\n\n{base_recipe_response(lowered)}"
     if is_prompt_injection(ingredients_input):
         refusal = (
             "I cannot share system instructions or hidden prompts. "
@@ -490,6 +586,16 @@ def defended_response(ingredients_input):
 def defended_chatbot_response(user_input, state):
     rng = random.SystemRandom()
     lowered = user_input.lower()
+    if is_hacking_activity(user_input):
+        refusal = rng.choice(REFUSAL_VARIANTS)
+        redirect = rng.choice(REDIRECT_VARIANTS)
+        base = (
+            f"{refusal} {redirect}\n\n"
+            "I can't help with hacking, website attacks, competitor targeting, or security bypass requests. "
+            "Let's stick to cooking."
+        )
+        key = f"security:{normalize_key(user_input)}"
+        return ensure_unique_response(state, key, base, "security", rng)
     if is_prompt_injection(user_input):
         refusal = rng.choice(REFUSAL_VARIANTS)
         redirect = rng.choice(REDIRECT_VARIANTS)
